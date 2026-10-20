@@ -20,6 +20,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
+from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus import (Image, KeepTogether, PageBreak, Paragraph, Preformatted, SimpleDocTemplate, Spacer,
                                 Table, TableStyle)
 
@@ -107,7 +108,7 @@ ax.set_title("Figure 3. E-commerce (electronic shopping & mail-order) share of r
 figs["share"] = save(fig, "f3_share.png")
 
 d = s_all["holiday_APE"].sort_values(ascending=False)
-fig, ax = plt.subplots(figsize=(7, 0.3 * len(d) + 0.8))
+fig, ax = plt.subplots(figsize=(7, 0.22 * len(d) + 0.6))
 ax.barh([f"{m} (hindsight*)" if "(named)" in m else m for m in d.index], d.values * 100, height=0.55,
         color=[GRAY if m == "Seasonal Naive" else (VIOLET if m.startswith(("Claude", "GPT")) else BLUE) for m in d.index])
 for i, v in enumerate(d.values):
@@ -245,7 +246,8 @@ def compact(prompt, first=0, last=24, per_line=6):
 
 
 def F(path, w=7.0, h=2.6):
-    return Image(path, width=w * inch, height=h * inch)
+    # figures are drawn at 90% so more of them fit beside their text (aspect ratio kept)
+    return Image(path, width=w * 0.9 * inch, height=h * 0.9 * inch)
 
 
 ens, nb_ = s_all.loc[RECOMMENDED, "holiday_APE"], s_all.loc["Seasonal Naive", "holiday_APE"]
@@ -256,6 +258,14 @@ sep_err = sep.loc[RECOMMENDED, "mean"] / sep.loc[RECOMMENDED, "actual"] - 1 if s
 sent_t = {"d": (s_all.loc["SARIMAX + Sentiment", "holiday_APE"] - s_all.loc["SARIMA", "holiday_APE"]) * 100}
 mem = tests.get("Claude (anonymized) vs Claude (named)")
 
+# Table of contents: every level-1 heading (and the appendix headings) with its page number
+toc = TableOfContents()
+toc.dotsMinLevel = 0
+toc.levelStyles = [ParagraphStyle("toc0", parent=body, fontSize=12, leading=17, spaceAfter=0, alignment=0, leftIndent=0,
+                                  firstLineIndent=0),
+                   ParagraphStyle("toc1", parent=body, fontSize=11, leading=15, spaceAfter=0, alignment=0, leftIndent=18,
+                                  firstLineIndent=0, textColor=colors.HexColor(INK2))]
+
 story = []
 # ---------------------------------------------------------------- title page + executive summary
 story += [P("Forecasting the 2026 U.S. Holiday Retail Season", ParagraphStyle("t", parent=h1, fontSize=20, leading=24)),
@@ -265,7 +275,8 @@ story += [P("Forecasting the 2026 U.S. Holiday Retail Season", ParagraphStyle("t
             "Group project, October 2026 · Charlotte Zhu, Shihan Wang, Jing Chang, Rachel Liu<br/>"
             f"Interactive dashboard: <link href='{DASHBOARD_URL}' color='{BLUE}'>{DASHBOARD_URL}</link><br/>"
             f"Code and data: <link href='{REPO_URL}' color='{BLUE}'>{REPO_URL}</link>", small),
-          Spacer(1, 8), P("Executive summary", h1)]
+          Spacer(1, 14), P("Contents", ParagraphStyle("toch", parent=h1, keepWithNext=0)), toc, PageBreak(),
+          P("Executive summary", h1)]
 story += [P(
     "November and December generate about <b>18% of U.S. retail sales</b> (22% for clothing stores), yet retailers must commit "
     "to holiday inventory in late summer. Small retailers typically plan on <i>'same as last year'</i>. Using U.S. Census "
@@ -295,7 +306,7 @@ exec_items.append("<b>Product:</b> a public dashboard with the forecast, a full 
 story += B(exec_items)
 story += [P("<b>Recommendation for retailers:</b> plan the holiday season on a statistical forecast rather than last year's "
             "numbers, size safety stock from measured forecast error, and treat AI-chatbot forecasts with caution: they "
-            "can look excellent on the past for the wrong reason."), PageBreak()]
+            "can look excellent on the past for the wrong reason.")]
 
 # ---------------------------------------------------------------- 1. Introduction
 story += [P("1. Motivation and research questions", h1), P(
@@ -395,7 +406,7 @@ story += [P("3.5 From forecast to order", h2), P(
     "±1.28σ (10th/90th percentiles).")]
 
 # ---------------------------------------------------------------- 4. Results
-story += [P("4. Results", h1), P("4.1 Overall accuracy (Q2)", h2), F(figs["errors"], h=0.3 * len(s_all) + 0.8)]
+story += [P("4. Results", h1), P("4.1 Overall accuracy (Q2)", h2), F(figs["errors"], h=0.22 * len(s_all) + 0.6)]
 rows = [["Model", "Nov+Dec error", "excl. COVID", "Monthly MAPE", "MASE", "80% cover.", "Beats naive"]]
 for m in s_all.index:
     r = s_all.loc[m]
@@ -515,11 +526,11 @@ story += B(["<b>Story</b> - motivation and headline findings.",
             "inputs, is instructed to quote numbers exactly and never invent forecasts or ranges, and says when the "
             "information is missing.",
             "<b>About</b> - objectives, data, methods, validation, usage instructions and AI-tool disclosure."])
-story += [Image(str(FIG / "s_battle.jpg"), width=4.8 * inch, height=3.0 * inch),
+story += [Image(str(FIG / "s_battle.jpg"), width=4.4 * inch, height=2.75 * inch),
           P("Screenshot 1. Model Battle tab: backtest accuracy of every forecaster; named LLM results are flagged as hindsight.", cap),
-          Image(str(FIG / "s_planner.jpg"), width=4.8 * inch, height=3.0 * inch),
+          Image(str(FIG / "s_planner.jpg"), width=4.4 * inch, height=2.75 * inch),
           P("Screenshot 2. Holiday Planner tab with the worked example below.", cap),
-          Image(str(FIG / "s_advisor.jpg"), width=4.8 * inch, height=3.0 * inch),
+          Image(str(FIG / "s_advisor.jpg"), width=4.4 * inch, height=2.75 * inch),
           P("Screenshot 3. AI Advisor answering 'Why do you recommend this order for my store?' - every number in the answer "
             "comes from the planner's computation.", cap)]
 story += [P(
@@ -580,11 +591,11 @@ story += [P("Appendix A. Data quality checks", h2), T(qrows, [1.8 * inch, 1.0 * 
 cache = [json.loads(x.read_text()) for x in (ROOT / "outputs/llm_cache").glob("*.json")]
 ex = build_prompt(panel["total"].dropna(), pd.Timestamp("2025-08-01"), "total", "anonymized")[0]
 resp = {c["model"].split("-")[0]: c for c in cache if c["prompt"] == ex}
-story += [P("Appendix B. A complete anonymized LLM prompt and both models' answers (total retail, origin August 2025)", h2),
+story += [P("Appendix B. Example LLM prompt and both models' answers", h2),
           P("<b>System instruction (both models):</b> 'You are a careful time-series forecaster. You are given a monthly history "
             "and must forecast the next 4 months. Use only the numbers provided. Think about level, trend, and month-of-year "
             "seasonality, then return your forecast in the requested JSON format.'"),
-          P("<b>User prompt</b> (the 120 monthly values are abbreviated here to the first and last 12):"),
+          P("<b>User prompt</b> for total retail, forecast origin August 2025 (the 120 monthly values are abbreviated here to the first and last 12):"),
           Preformatted(compact(ex, first=12, last=12),
                        ParagraphStyle("code2", parent=small, fontName="Courier", fontSize=8, leading=9.6))]
 for k, lab in [("claude", "Claude Opus 5.5"), ("gpt", "GPT-5.5")]:
@@ -608,8 +619,24 @@ def footer(canvas, doc):
     canvas.restoreState()
 
 
-doc = SimpleDocTemplate(str(OUT / "Written_Report.pdf"), pagesize=letter, leftMargin=0.8 * inch, rightMargin=0.8 * inch,
+class ReportDoc(SimpleDocTemplate):
+    """Registers headings with the table of contents and adds a clickable PDF bookmark for each."""
+
+    def afterFlowable(self, flowable):
+        if not isinstance(flowable, Paragraph):
+            return
+        name, text = flowable.style.name, flowable.getPlainText()
+        level = 0 if name == "h1" else (1 if name == "h2" and text.startswith("Appendix") else None)
+        if level is None:
+            return
+        key = f"h{id(flowable)}"
+        self.canv.bookmarkPage(key)
+        self.canv.addOutlineEntry(text, key, level=level)
+        self.notify("TOCEntry", (level, text, self.page, key))
+
+
+doc = ReportDoc(str(OUT / "Written_Report.pdf"), pagesize=letter, leftMargin=0.8 * inch, rightMargin=0.8 * inch,
                         topMargin=0.7 * inch, bottomMargin=0.75 * inch, title="Forecasting the 2026 U.S. Holiday Retail Season",
                         author="Charlotte Zhu, Shihan Wang, Jing Chang, Rachel Liu")
-doc.build(story, onFirstPage=footer, onLaterPages=footer)
+doc.multiBuild(story, onFirstPage=footer, onLaterPages=footer)
 print(OUT / "Written_Report.pdf")
