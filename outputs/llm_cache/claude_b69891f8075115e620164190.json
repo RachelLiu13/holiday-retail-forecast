@@ -1,0 +1,11 @@
+{
+ "reasoning": "Recent levels run around 85-91 (the most recent Jul-Aug at about 91), slightly above the prior year. Over the last few years Sep has been about 0.92-0.97 of the preceding Aug, Oct roughly equal to or a bit above Sep, Nov about 1.17-1.21 of Oct, and Dec about 1.15-1.18 of Nov. Applying these ratios to a slightly firmer base gives the forecast.",
+ "forecast": [
+  85.5,
+  86.5,
+  103.5,
+  120.5
+ ],
+ "model": "claude-opus-5-5",
+ "prompt": "Below are 120 consecutive months of an anonymous monthly sales index (first month = 100). Only the calendar month is shown; the series runs oldest to newest.\n\nSep: 100.0\nOct: 97.7\nNov: 124.5\nDec: 155.3\nJan: 91.0\nFeb: 93.8\nMar: 94.8\nApr: 84.4\nMay: 90.3\nJun: 92.3\nJul: 92.9\nAug: 98.5\nSep: 93.0\nOct: 88.5\nNov: 115.4\nDec: 143.4\nJan: 88.3\nFeb: 84.3\nMar: 94.1\nApr: 83.8\nMay: 89.8\nJun: 90.7\nJul: 88.7\nAug: 93.7\nSep: 91.5\nOct: 89.8\nNov: 121.6\nDec: 143.0\nJan: 90.9\nFeb: 86.8\nMar: 94.4\nApr: 84.9\nMay: 91.9\nJun: 93.1\nJul: 91.5\nAug: 97.5\nSep: 90.3\nOct: 91.0\nNov: 119.0\nDec: 136.9\nJan: 89.3\nFeb: 81.8\nMar: 89.5\nApr: 80.6\nMay: 88.4\nJun: 86.6\nJul: 88.9\nAug: 92.8\nSep: 87.7\nOct: 87.1\nNov: 113.3\nDec: 132.9\nJan: 85.4\nFeb: 80.2\nMar: 69.3\nApr: 35.8\nMay: 46.7\nJun: 66.5\nJul: 77.0\nAug: 80.4\nSep: 75.9\nOct: 80.6\nNov: 97.3\nDec: 111.2\nJan: 82.0\nFeb: 73.4\nMar: 94.5\nApr: 88.3\nMay: 90.3\nJun: 95.1\nJul: 95.5\nAug: 94.7\nSep: 91.1\nOct: 94.9\nNov: 107.6\nDec: 125.6\nJan: 83.4\nFeb: 80.3\nMar: 95.3\nApr: 90.0\nMay: 90.1\nJun: 88.7\nJul: 90.2\nAug: 93.9\nSep: 90.9\nOct: 87.6\nNov: 100.5\nDec: 116.7\nJan: 88.7\nFeb: 80.5\nMar: 88.1\nApr: 78.3\nMay: 85.1\nJun: 85.9\nJul: 84.0\nAug: 89.1\nSep: 87.3\nOct: 86.2\nNov: 101.6\nDec: 115.6\nJan: 85.6\nFeb: 84.1\nMar: 83.4\nApr: 80.7\nMay: 88.4\nJun: 84.3\nJul: 88.3\nAug: 88.6\nSep: 81.2\nOct: 84.3\nNov: 102.4\nDec: 121.1\nJan: 83.3\nFeb: 78.2\nMar: 85.2\nApr: 81.1\nMay: 88.6\nJun: 85.6\nJul: 91.8\nAug: 91.1\n\nForecast the next 4 months (Sep, Oct, Nov, Dec) on the same index scale."
+}

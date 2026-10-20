@@ -1,0 +1,11 @@
+{
+ "reasoning": "Recent year-over-year growth has slowed to roughly 1\u20132.5%. I anchored on last August and this August, then applied the typical month-to-month seasonal shape from prior years: a dip in September (about -2.3% vs August), a rise in October and November, and a December peak about 7\u20138% above November.",
+ "forecast": [
+  155.2,
+  159.9,
+  161.4,
+  173.7
+ ],
+ "model": "claude-opus-5-5",
+ "prompt": "Below are 120 consecutive months of an anonymous monthly sales index (first month = 100). Only the calendar month is shown; the series runs oldest to newest.\n\nSep: 100.0\nOct: 103.9\nNov: 105.8\nDec: 112.2\nJan: 104.7\nFeb: 96.7\nMar: 105.2\nApr: 104.9\nMay: 111.8\nJun: 107.0\nJul: 111.1\nAug: 110.9\nSep: 105.1\nOct: 110.1\nNov: 110.2\nDec: 118.3\nJan: 109.8\nFeb: 100.9\nMar: 109.7\nApr: 107.7\nMay: 114.6\nJun: 109.8\nJul: 114.6\nAug: 112.0\nSep: 107.8\nOct: 111.6\nNov: 110.4\nDec: 120.0\nJan: 110.2\nFeb: 104.8\nMar: 112.4\nApr: 108.9\nMay: 114.6\nJun: 113.2\nJul: 115.8\nAug: 113.5\nSep: 111.2\nOct: 113.7\nNov: 114.6\nDec: 125.8\nJan: 112.0\nFeb: 105.6\nMar: 116.7\nApr: 115.5\nMay: 120.3\nJun: 117.3\nJul: 119.3\nAug: 118.9\nSep: 116.7\nOct: 117.6\nNov: 120.2\nDec: 131.2\nJan: 116.9\nFeb: 109.2\nMar: 123.3\nApr: 115.0\nMay: 124.7\nJun: 121.4\nJul: 122.5\nAug: 123.0\nSep: 118.4\nOct: 121.0\nNov: 123.4\nDec: 131.9\nJan: 122.1\nFeb: 110.5\nMar: 123.4\nApr: 121.0\nMay: 129.1\nJun: 125.1\nJul: 128.6\nAug: 129.6\nSep: 120.6\nOct: 124.9\nNov: 127.7\nDec: 134.3\nJan: 123.6\nFeb: 118.2\nMar: 154.6\nApr: 135.1\nMay: 145.1\nJun: 135.9\nJul: 142.1\nAug: 136.9\nSep: 131.6\nOct: 136.1\nNov: 136.2\nDec: 146.8\nJan: 136.4\nFeb: 125.4\nMar: 138.4\nApr: 136.4\nMay: 145.8\nJun: 143.0\nJul: 147.8\nAug: 145.9\nSep: 142.6\nOct: 148.0\nNov: 147.7\nDec: 161.1\nJan: 146.3\nFeb: 135.3\nMar: 148.9\nApr: 149.5\nMay: 155.9\nJun: 154.7\nJul: 158.3\nAug: 155.5\nSep: 152.0\nOct: 157.0\nNov: 159.0\nDec: 171.3\nJan: 151.7\nFeb: 142.5\nMar: 155.3\nApr: 153.0\nMay: 160.3\nJun: 156.1\nJul: 159.7\nAug: 159.1\n\nForecast the next 4 months (Sep, Oct, Nov, Dec) on the same index scale."
+}

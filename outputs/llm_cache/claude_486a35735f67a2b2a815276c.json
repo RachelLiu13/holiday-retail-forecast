@@ -1,0 +1,11 @@
+{
+ "reasoning": "The series shows strong seasonality, with a large November\u2013December peak. The current year's Jan\u2013Aug level is about 5% below the prior year's. I scaled last year's Sep\u2013Dec values by roughly 0.95, nudged slightly upward because August was relatively firm.",
+ "forecast": [
+  90.6,
+  88.6,
+  113.0,
+  141.0
+ ],
+ "model": "claude-opus-5-5",
+ "prompt": "Below are 120 consecutive months of an anonymous monthly sales index (first month = 100). Only the calendar month is shown; the series runs oldest to newest.\n\nSep: 100.0\nOct: 96.2\nNov: 123.6\nDec: 185.1\nJan: 104.0\nFeb: 99.0\nMar: 101.7\nApr: 91.4\nMay: 100.0\nJun: 100.2\nJul: 100.7\nAug: 109.9\nSep: 98.8\nOct: 99.6\nNov: 130.7\nDec: 181.0\nJan: 103.7\nFeb: 104.0\nMar: 101.9\nApr: 95.1\nMay: 105.5\nJun: 103.2\nJul: 105.2\nAug: 107.7\nSep: 96.1\nOct: 93.0\nNov: 118.7\nDec: 160.8\nJan: 100.4\nFeb: 97.1\nMar: 90.7\nApr: 82.7\nMay: 87.3\nJun: 90.3\nJul: 90.0\nAug: 93.4\nSep: 86.5\nOct: 84.4\nNov: 112.6\nDec: 153.3\nJan: 91.2\nFeb: 93.8\nMar: 92.8\nApr: 85.5\nMay: 90.9\nJun: 95.2\nJul: 95.0\nAug: 97.2\nSep: 91.4\nOct: 87.4\nNov: 113.3\nDec: 155.6\nJan: 90.6\nFeb: 93.0\nMar: 97.8\nApr: 87.5\nMay: 91.0\nJun: 94.0\nJul: 96.0\nAug: 101.1\nSep: 92.8\nOct: 94.5\nNov: 122.0\nDec: 158.3\nJan: 93.9\nFeb: 99.0\nMar: 102.1\nApr: 86.9\nMay: 95.5\nJun: 96.1\nJul: 98.3\nAug: 101.7\nSep: 93.8\nOct: 91.7\nNov: 124.5\nDec: 162.0\nJan: 97.8\nFeb: 99.0\nMar: 99.3\nApr: 88.2\nMay: 94.6\nJun: 94.3\nJul: 96.7\nAug: 100.7\nSep: 94.1\nOct: 96.3\nNov: 124.1\nDec: 155.8\nJan: 94.4\nFeb: 94.2\nMar: 97.8\nApr: 86.3\nMay: 91.9\nJun: 90.9\nJul: 94.4\nAug: 97.9\nSep: 97.9\nOct: 96.5\nNov: 127.9\nDec: 161.8\nJan: 95.6\nFeb: 92.2\nMar: 94.3\nApr: 85.0\nMay: 91.2\nJun: 94.8\nJul: 94.2\nAug: 96.5\nSep: 95.4\nOct: 93.2\nNov: 118.8\nDec: 148.1\nJan: 86.8\nFeb: 89.5\nMar: 90.5\nApr: 80.5\nMay: 86.1\nJun: 88.1\nJul: 88.7\nAug: 94.0\n\nForecast the next 4 months (Sep, Oct, Nov, Dec) on the same index scale."
+}

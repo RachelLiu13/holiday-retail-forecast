@@ -3,6 +3,7 @@
 No model is fit inside the app: the forecasts and metrics come from the reproducible
 pipeline in src/, so what the dashboard shows is exactly what the code produced.
 """
+import json
 import sys
 from pathlib import Path
 
@@ -53,7 +54,9 @@ def load_all():
     po = _read("metrics_per_origin.csv")
     reasoning = _read("llm_reasoning.csv")
     imp = _read("xgb_feature_importance.csv", index_col=0)
-    return dict(panel=panel, bt=bt, f26=f26, po=po, reasoning=reasoning, imp=imp)
+    tp = OUT / "llm_tests.json"
+    tests = json.loads(tp.read_text()) if tp.exists() else {}
+    return dict(panel=panel, bt=bt, f26=f26, po=po, reasoning=reasoning, imp=imp, tests=tests)
 
 
 def models_present(df):
@@ -93,6 +96,44 @@ def summary_table(po, exclude_covid):
     return s.sort_values("holiday_APE")
 
 
+def _sig(p):
+    return f"p = {p:.3f}, statistically significant" if p < 0.05 else f"p = {p:.2f}, not statistically significant"
+
+
+def llm_findings(tests, s_all):
+    """Plain-English LLM conclusions, shared by the dashboard, the PDF and the AI advisor."""
+    out = {}
+    mem = tests.get("Claude (anonymized) vs Claude (named)")
+    if mem:
+        a, n = s_all.loc["Claude (anonymized)", "holiday_APE"], s_all.loc["Claude (named)", "holiday_APE"]
+        if mem["p_value"] < 0.05 and mem["mean_diff_pts"] > 0:
+            out["memorization"] = (
+                f"Told the category and the year, Claude looked like the best forecaster of all ({n:.1%} average error). "
+                f"With them hidden, its error rose to {a:.1%}. The named prompt won in {mem['b_better_share']:.0%} of "
+                f"{mem['n']} category-seasons ({_sig(mem['p_value'])}), and the gap was largest in 2020-2022 "
+                f"({mem['mean_diff_pts_2020_2022']:+.1f} points vs {mem['mean_diff_pts']:+.1f} overall) - exactly when "
+                f"knowing what really happened (the pandemic, inflation) helps most. That is hindsight, not forecasting, "
+                f"so only anonymized scores measure skill.")
+        else:
+            out["memorization"] = (f"Named and anonymized prompts scored similarly ({n:.1%} vs {a:.1%}; {_sig(mem['p_value'])}), "
+                                   f"so we see little sign that Claude was recalling published figures.")
+    skill = []
+    for llm in ("Claude (anonymized)", "GPT (anonymized)"):
+        t = tests.get(f"{llm} vs Ensemble")
+        if t:
+            verdict = "better" if t["mean_diff_pts"] > 0 else "worse"
+            skill.append(f"{llm.split(' ')[0]} {s_all.loc[llm, 'holiday_APE']:.1%}")
+            out.setdefault("_tests", []).append(
+                f"the ensemble was {verdict} than {llm.split(' ')[0]} in {max(t['b_better_share'], 1 - t['b_better_share']):.0%} "
+                f"of cases ({_sig(t['p_value'])})")
+    if skill:
+        out["skill"] = (f"On anonymized data, the chatbots missed the holiday total by {', '.join(skill)}, vs "
+                        f"{s_all.loc['Ensemble', 'holiday_APE']:.1%} for our ensemble and "
+                        f"{s_all.loc['Seasonal Naive', 'holiday_APE']:.1%} for 'same as last year'; "
+                        + "; ".join(out.pop("_tests")) + ".")
+    return out
+
+
 def ecommerce_share(panel):
     s = (panel["ecommerce"] / panel["total"]).dropna()
     ytd = {y: panel.loc[f"{y}-01":f"{y}-08", "ecommerce"].sum() / panel.loc[f"{y}-01":f"{y}-08", "total"].sum()
@@ -130,6 +171,9 @@ def facts_for_ai(data, planner_state=None):
         r26 = r[r.origin.astype(str).str.startswith("2026")]
         lines += ["", "## LLM forecasters' own explanations for 2026 (named prompts)",
                   r26[["model", "category", "reasoning"]].to_csv(index=False)]
+    lf = llm_findings(data.get("tests", {}), s_all)
+    if lf:
+        lines += ["", "## LLM forecasting conclusions (from paired Wilcoxon tests)"] + list(lf.values())
     if planner_state:
         lines += ["", "## The user's current Holiday Planner inputs and the computed result",
                   "\n".join(f"- {k}: {v}" for k, v in planner_state.items())]

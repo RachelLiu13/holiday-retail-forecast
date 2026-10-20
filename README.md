@@ -6,9 +6,27 @@ LLM forecasters on 11 past seasons, and turning the forecast into an order recom
 UCLA Anderson, *Time Series Analysis and Forecasting* (Dr. William Yu), group project, fall 2026.
 Team: Charlotte Zhu, Shihan Wang, Jing Chang, Rachel Liu.
 
-- **Live dashboard:** _link added after deployment_
+- **Live dashboard:** https://holiday-retail-planner.streamlit.app
+- **Written report (15 pages, executive summary):** [`reports/Written_Report.pdf`](reports/Written_Report.pdf)
+- **Short product description (3 pages):** [`reports/Project_Description.pdf`](reports/Project_Description.pdf)
+- **Standalone notebook:** [`notebooks/Holiday_Retail_Forecast.ipynb`](notebooks/Holiday_Retail_Forecast.ipynb) - one
+  self-contained file that downloads the data and reproduces every model, table and chart (Jupyter or Google Colab)
 - **Data:** U.S. Census Bureau Monthly Retail Trade (not seasonally adjusted) and University of Michigan Consumer
   Sentiment, both via [FRED](https://fred.stlouisfed.org/). Downloaded automatically; no account needed.
+
+## Headline results
+
+| Forecaster (11 holiday seasons, 2015-2025) | Nov+Dec error |
+|---|---|
+| Ensemble (SARIMA + ETS + XGBoost) - recommended | 2.29% |
+| SARIMA | 2.34% |
+| Claude Opus 5.5, anonymized prompt | 2.52% |
+| GPT-5.5, anonymized prompt | 2.86% |
+| "Same as last year" (seasonal naive) | 5.32% |
+| Claude Opus 5.5, *named* prompt (can recall the past) | 2.00% |
+
+2026 forecast: total holiday retail sales of $1,383B, +5.2% over 2025. Told the category and year, Claude looks like
+the best forecaster; with them hidden it is not (paired Wilcoxon p = 0.002) - hindsight, not foresight.
 
 ## Project layout
 
@@ -25,7 +43,9 @@ app/
   data_layer.py     loading, tables and the AI advisor's fact sheet
   about.md          objectives, methods, validation, usage, AI tools
 notebooks/
-  analysis.ipynb    walk-through of the whole analysis with charts
+  Holiday_Retail_Forecast.ipynb   standalone version of the whole analysis (generated from src/)
+reports/
+  build_report.py, build_description.py, build_standalone_notebook.py   regenerate the deliverables from outputs/
 outputs/            every forecast, metric and LLM response produced by the code
 ```
 
@@ -36,7 +56,10 @@ python3 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m src.data          # download data (add --refresh for the latest release)
 .venv/bin/python -m src.backtest      # ~2 minutes: all classical/ML models, 11 seasons + 2026
 .venv/bin/python -m src.llm_forecast  # needs API keys in .env (see .env.example); cached in outputs/llm_cache
-.venv/bin/python -m src.evaluate      # metrics tables
+.venv/bin/python -m src.evaluate      # metrics tables and significance tests
+.venv/bin/python reports/build_report.py               # Written_Report.pdf
+.venv/bin/python reports/build_description.py          # Project_Description.pdf
+.venv/bin/python reports/build_standalone_notebook.py  # notebooks/Holiday_Retail_Forecast.ipynb
 .venv/bin/python -m streamlit run app/streamlit_app.py
 ```
 

@@ -10,8 +10,11 @@ Metrics
 
 Run:  python -m src.evaluate
 """
+import json
+
 import numpy as np
 import pandas as pd
+from scipy.stats import wilcoxon
 
 from .config import HOLIDAY_MONTHS, OUTPUTS
 from .data import load_panel
@@ -74,6 +77,28 @@ def summary(po: pd.DataFrame, exclude_covid: bool = False) -> pd.DataFrame:
     return s.sort_values("holiday_APE")
 
 
+def paired_test(po: pd.DataFrame, a: str, b: str) -> dict | None:
+    """Compare two models on the same category-seasons (paired Wilcoxon signed-rank test).
+
+    Positive mean_diff means model `a` had the larger holiday error.
+    """
+    pv = po.pivot_table(index=["category", "year"], columns="model", values="holiday_ape")
+    if a not in pv or b not in pv:
+        return None
+    d = (pv[a] - pv[b]).dropna()
+    by_year = (pv[[a, b]].groupby("year").mean() * 100).round(2)
+    covid = d[d.index.get_level_values("year").isin([2020, 2021, 2022])]
+    return {"a": a, "b": b, "n": int(len(d)), "b_better_share": float((d > 0).mean()),
+            "mean_diff_pts": float(d.mean() * 100), "p_value": float(wilcoxon(d).pvalue),
+            "mean_diff_pts_2020_2022": float(covid.mean() * 100),
+            "by_year": by_year.reset_index().to_dict(orient="list")}
+
+
+LLM_TESTS = [("Claude (anonymized)", "Claude (named)"),   # memorization: does knowing name + year help?
+             ("GPT (anonymized)", "Ensemble"), ("Claude (anonymized)", "Ensemble"),
+             ("GPT (anonymized)", "Claude (anonymized)")]
+
+
 def main():
     panel = load_panel()
     po = per_origin(load_backtest(), panel)
@@ -83,10 +108,14 @@ def main():
     s_ex.to_csv(OUTPUTS / "metrics_summary_ex_covid.csv")
     by_cat = po.pivot_table(index="category", columns="model", values="holiday_ape", aggfunc="mean")
     by_cat.to_csv(OUTPUTS / "metrics_by_category.csv")
+    tests = {f"{a} vs {b}": t for a, b in LLM_TESTS if (t := paired_test(po, a, b))}
+    (OUTPUTS / "llm_tests.json").write_text(json.dumps(tests, indent=1))
     pd.set_option("display.width", 200)
     print("== All 11 seasons ==\n", s_all.round(4))
     print("\n== Excluding 2020-2021 ==\n", s_ex.round(4))
     print("\n== Holiday APE by category ==\n", (by_cat * 100).round(2))
+    for k, t in tests.items():
+        print(f"{k}: {t['b']} better in {t['b_better_share']:.0%} of {t['n']}, mean diff {t['mean_diff_pts']:+.2f} pts, p={t['p_value']:.4f}")
 
 
 if __name__ == "__main__":

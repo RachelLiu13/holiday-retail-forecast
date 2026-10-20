@@ -1,0 +1,11 @@
+{
+ "reasoning": "The series has strong seasonality, with a Nov\u2013Dec peak and a soft Sep\u2013Oct. Before the shock it was in slow decline. After the shock, the level recovered to about 5% above the last pre-shock year. I applied typical Sep\u2013Dec ratios to the latest August level and blended that with the pre-shock Sep\u2013Dec values scaled by about 1.05.",
+ "forecast": [
+  93.5,
+  93.5,
+  121.0,
+  142.0
+ ],
+ "model": "claude-opus-5-5",
+ "prompt": "Below are 120 consecutive months of an anonymous monthly sales index (first month = 100). Only the calendar month is shown; the series runs oldest to newest.\n\nSep: 100.0\nOct: 101.7\nNov: 131.4\nDec: 170.5\nJan: 101.2\nFeb: 106.7\nMar: 109.9\nApr: 93.6\nMay: 102.8\nJun: 103.5\nJul: 105.8\nAug: 109.5\nSep: 101.0\nOct: 98.8\nNov: 134.1\nDec: 174.5\nJan: 105.4\nFeb: 106.6\nMar: 106.9\nApr: 95.0\nMay: 101.9\nJun: 101.6\nJul: 104.1\nAug: 108.5\nSep: 101.4\nOct: 103.7\nNov: 133.6\nDec: 167.8\nJan: 101.7\nFeb: 101.4\nMar: 105.3\nApr: 92.9\nMay: 98.9\nJun: 97.9\nJul: 101.7\nAug: 105.5\nSep: 105.5\nOct: 104.0\nNov: 137.7\nDec: 174.2\nJan: 103.0\nFeb: 99.3\nMar: 101.5\nApr: 91.6\nMay: 98.2\nJun: 102.1\nJul: 101.5\nAug: 103.9\nSep: 102.8\nOct: 100.4\nNov: 128.0\nDec: 159.6\nJan: 93.5\nFeb: 96.3\nMar: 97.5\nApr: 86.7\nMay: 92.8\nJun: 94.9\nJul: 95.5\nAug: 101.2\nSep: 95.6\nOct: 90.9\nNov: 118.6\nDec: 147.4\nJan: 90.7\nFeb: 86.7\nMar: 96.7\nApr: 86.1\nMay: 92.3\nJun: 93.2\nJul: 91.2\nAug: 96.3\nSep: 94.0\nOct: 92.3\nNov: 124.9\nDec: 146.9\nJan: 93.4\nFeb: 89.2\nMar: 97.0\nApr: 87.2\nMay: 94.4\nJun: 95.7\nJul: 94.1\nAug: 100.2\nSep: 92.8\nOct: 93.5\nNov: 122.3\nDec: 140.7\nJan: 91.7\nFeb: 84.0\nMar: 92.0\nApr: 82.9\nMay: 90.8\nJun: 89.0\nJul: 91.3\nAug: 95.4\nSep: 90.2\nOct: 89.5\nNov: 116.4\nDec: 136.5\nJan: 87.7\nFeb: 82.5\nMar: 71.2\nApr: 36.8\nMay: 48.0\nJun: 68.3\nJul: 79.2\nAug: 82.6\nSep: 78.0\nOct: 82.8\nNov: 100.0\nDec: 114.3\nJan: 84.2\nFeb: 75.5\nMar: 97.1\nApr: 90.7\nMay: 92.8\nJun: 97.7\nJul: 98.1\nAug: 97.3\n\nForecast the next 4 months (Sep, Oct, Nov, Dec) on the same index scale."
+}

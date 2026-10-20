@@ -1,0 +1,11 @@
+{
+ "reasoning": "The series has a stable seasonal pattern: Sep runs about 0.82\u20130.84 of Aug, Oct dips below Sep, Nov rises, and Dec peaks at roughly 1.75 times Sep. The level has drifted up over the last two years, with this year's Jan\u2013Aug running about 3% above last year. I applied those seasonal ratios to the current level and tempered the result against last year's unusually strong Sep\u2013Dec.",
+ "forecast": [
+  113.0,
+  106.0,
+  129.0,
+  198.0
+ ],
+ "model": "claude-opus-5-5",
+ "prompt": "Below are 120 consecutive months of an anonymous monthly sales index (first month = 100). Only the calendar month is shown; the series runs oldest to newest.\n\nSep: 100.0\nOct: 94.7\nNov: 115.2\nDec: 190.4\nJan: 108.5\nFeb: 88.0\nMar: 102.2\nApr: 96.8\nMay: 100.7\nJun: 104.3\nJul: 100.6\nAug: 123.6\nSep: 110.1\nOct: 97.0\nNov: 116.4\nDec: 191.0\nJan: 106.7\nFeb: 86.1\nMar: 105.6\nApr: 96.1\nMay: 105.9\nJun: 111.6\nJul: 108.1\nAug: 132.8\nSep: 108.6\nOct: 102.1\nNov: 126.1\nDec: 191.6\nJan: 112.1\nFeb: 94.0\nMar: 104.4\nApr: 100.9\nMay: 110.1\nJun: 108.6\nJul: 108.9\nAug: 136.6\nSep: 105.8\nOct: 96.0\nNov: 115.2\nDec: 184.6\nJan: 110.1\nFeb: 86.7\nMar: 97.7\nApr: 97.2\nMay: 102.0\nJun: 104.6\nJul: 103.1\nAug: 128.5\nSep: 106.1\nOct: 95.4\nNov: 110.6\nDec: 184.9\nJan: 107.2\nFeb: 85.3\nMar: 103.0\nApr: 96.7\nMay: 100.6\nJun: 106.6\nJul: 104.2\nAug: 126.6\nSep: 104.6\nOct: 96.3\nNov: 119.2\nDec: 187.3\nJan: 104.1\nFeb: 88.7\nMar: 105.2\nApr: 102.5\nMay: 101.5\nJun: 106.5\nJul: 102.3\nAug: 130.3\nSep: 108.6\nOct: 95.0\nNov: 117.4\nDec: 179.7\nJan: 103.4\nFeb: 94.2\nMar: 111.4\nApr: 101.8\nMay: 108.0\nJun: 112.4\nJul: 105.7\nAug: 131.0\nSep: 107.1\nOct: 99.4\nNov: 120.9\nDec: 187.8\nJan: 111.5\nFeb: 95.3\nMar: 113.0\nApr: 101.5\nMay: 108.7\nJun: 110.8\nJul: 109.8\nAug: 131.5\nSep: 107.8\nOct: 103.0\nNov: 128.2\nDec: 190.2\nJan: 101.7\nFeb: 91.2\nMar: 106.5\nApr: 105.3\nMay: 109.4\nJun: 110.2\nJul: 110.9\nAug: 138.5\nSep: 113.8\nOct: 109.2\nNov: 130.9\nDec: 200.6\nJan: 106.8\nFeb: 92.7\nMar: 111.6\nApr: 106.6\nMay: 113.5\nJun: 115.1\nJul: 116.1\nAug: 135.3\n\nForecast the next 4 months (Sep, Oct, Nov, Dec) on the same index scale."
+}

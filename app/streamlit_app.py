@@ -11,8 +11,8 @@ import streamlit as st
 from scipy.stats import norm
 
 from data_layer import (COVID_YEARS, GRID, INK, INK2, LABELS, MODEL_COLORS, RECOMMENDED, SHORT,
-                        ecommerce_share, error_spread, facts_for_ai, holiday_table, load_all,
-                        models_present, summary_table)
+                        ecommerce_share, error_spread, facts_for_ai, holiday_table, llm_findings,
+                        load_all, models_present, summary_table)
 
 st.set_page_config(page_title="Holiday Retail Planner 2026", page_icon="🎄", layout="wide")
 
@@ -71,7 +71,8 @@ tabs = st.tabs(["📖 Story", "📈 Market", "🔮 2026 Forecast", "🥊 Model B
 # ================================================================= STORY
 with tabs[0]:
     tot_g = hol_growth.loc["total", RECOMMENDED]
-    best = s_all.index[0]
+    # 'named' LLM prompts can recall past data, so they are excluded from the 'best model' headline
+    best = next(m for m in s_all.index if '(named)' not in m)
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("2026 holiday sales forecast", pct(tot_g), help="Total retail (ex. food services), Nov+Dec 2026 vs Nov+Dec 2025, ensemble model")
     c2.metric("Forecast: Nov+Dec 2026 total retail", money(hol_fc.loc["total", RECOMMENDED], md=False))
@@ -115,14 +116,11 @@ with tabs[0]:
         f"{pct(share_ytd.loc[2019], False)} in 2019, and forecast to grow {pct(hol_growth.loc['ecommerce', RECOMMENDED])} "
         f"this holiday season.",
     ]
-    if HAS_LLM:
-        la = s_all.reindex(["Claude (anonymized)", "GPT (anonymized)"]).dropna(subset=["holiday_APE"])
-        if len(la):
-            best_llm = la["holiday_APE"].idxmin()
-            findings.append(
-                f"**AI chatbots are competitive but not better.** On anonymized data (so they can't recall the answer), "
-                f"{best_llm} missed by {pct(la.loc[best_llm, 'holiday_APE'], False)} vs "
-                f"{pct(s_all.loc[RECOMMENDED, 'holiday_APE'], False)} for the ensemble. See *Model Battle*.")
+    lf = llm_findings(D["tests"], s_all)
+    if "memorization" in lf:
+        findings.append("**AI chatbots: hindsight, not foresight.** " + lf["memorization"])
+    if "skill" in lf:
+        findings.append("**Fairly tested, chatbots are good but not better.** " + lf["skill"])
     for f in findings:
         st.markdown(f"- {f}")
     st.info("Use the tabs above: explore the market, see the 2026 forecast, check how every model did "
@@ -251,7 +249,8 @@ with tabs[3]:
     s = s_ex if ex else s_all
     s = s.dropna(subset=["holiday_APE"])
     fig = go.Figure()
-    fig.add_bar(y=s.index, x=s["holiday_APE"], orientation="h",
+    ylab = [f"{m} - hindsight*" if "(named)" in m else m for m in s.index]
+    fig.add_bar(y=ylab, x=s["holiday_APE"], orientation="h",
                 marker_color=[MODEL_COLORS.get(m, "#8a8984") for m in s.index],
                 text=[f"{v:.1%}" for v in s["holiday_APE"]], textposition="outside", textfont=dict(color=INK2),
                 hovertemplate="%{y}: average error %{x:.2%}<extra></extra>")
@@ -262,6 +261,9 @@ with tabs[3]:
     fig.update_xaxes(tickformat=".0%", gridcolor=GRID, showgrid=True)
     st.plotly_chart(fig, width="stretch")
 
+    if any("(named)" in m for m in s.index):
+        st.caption("*Named LLM prompts include the real category and year, so the model can recall what actually happened. "
+                   "They are shown for the memorization test only - the fair LLM scores are the anonymized ones.")
     show = s.copy()
     show_fmt = pd.DataFrame({
         "Nov+Dec error": show["holiday_APE"].map("{:.2%}".format),
@@ -325,11 +327,10 @@ with tabs[3]:
                                 marker=dict(size=8, line=dict(color="white", width=2)), hovertemplate="%{y:.2%}")
             fig.update_layout(title=dict(text="Claude's Nov+Dec error by season: anonymized vs named prompts", font=dict(size=14, color=INK)))
             st.plotly_chart(style(fig, 340, yfmt=".1%"), width="stretch")
-            a, n = mm.mean()
-            st.markdown(f"Average error: anonymized **{a:.2%}**, named **{n:.2%}**. " + (
-                "Named prompts were noticeably more accurate - consistent with some memorization, so only the anonymized "
-                "results are a fair test of forecasting skill." if n < a * 0.8 else
-                "The two are similar, so there is little sign that Claude was simply recalling published figures."))
+            lf = llm_findings(D["tests"], s_all)
+            st.markdown(lf.get("memorization", ""))
+            if "skill" in lf:
+                st.markdown(lf["skill"])
 
     with st.expander("What drives the XGBoost model? (feature importance, 2025 backtest)"):
         imp = D["imp"]

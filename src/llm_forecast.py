@@ -115,7 +115,8 @@ def ask_claude(text: str) -> dict:
     if resp.stop_reason == "refusal":
         raise RuntimeError(f"refused: {resp.stop_details}")
     raw = next(b.text for b in resp.content if b.type == "text")
-    return {**_parse(raw), "model": resp.model}
+    return {**_parse(raw), "model": resp.model,
+            "usage": {"input": resp.usage.input_tokens, "output": resp.usage.output_tokens}}
 
 
 def openai_model() -> str:
@@ -135,7 +136,8 @@ def ask_openai(text: str, model: str) -> dict:
                   {"role": "user", "content": text + "\n\nReturn JSON: {\"reasoning\": str, \"forecast\": [4 numbers]}"}],
         response_format={"type": "json_object"},
     )
-    return {**_parse(resp.choices[0].message.content), "model": resp.model}
+    return {**_parse(resp.choices[0].message.content), "model": resp.model,
+            "usage": {"input": resp.usage.prompt_tokens, "output": resp.usage.completion_tokens}}
 
 
 def ask(provider: str, text: str, oa_model: str | None) -> dict:
@@ -143,15 +145,15 @@ def ask(provider: str, text: str, oa_model: str | None) -> dict:
     path = _cache_path(provider, model, text)
     if path.exists():
         return json.loads(path.read_text())
-    for attempt in range(4):
+    for attempt in range(8):
         try:
             out = ask_claude(text) if provider == "claude" else ask_openai(text, model)
             break
         except Exception as e:  # retries cover rate limits and the rare malformed answer
-            if attempt == 3:
+            if attempt == 7:
                 raise
-            print(f"  retry {provider} ({type(e).__name__}: {e})")
-            time.sleep(5 * (attempt + 1))
+            print(f"  retry {provider} ({type(e).__name__}: {str(e)[:120]})", flush=True)
+            time.sleep(min(90, 10 * 2 ** attempt))  # back off: 10s, 20s, 40s, then 90s
     CACHE.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({**out, "prompt": text}, indent=1))
     return out
@@ -166,21 +168,34 @@ DISPLAY = {("claude", "anonymized"): "Claude (anonymized)",
            ("openai", "named"): "GPT (named)"}
 
 
-def run(origins, runs, panel, oa_model):
-    rows, notes = [], []
+def run(origins, runs, panel, oa_model, workers=None):
+    # GPT-5.5 reasons at length, so fewer parallel requests keep it under the tokens-per-minute limit
+    workers = workers or (3 if any(p == "openai" for p, _ in runs) else 8)
+    from concurrent.futures import ThreadPoolExecutor
+
     jobs = [(p, f, c, o) for o in origins for c in CATEGORIES for p, f in runs]
-    for i, (prov, framing, cat, origin) in enumerate(jobs, 1):
-        y = panel[cat].dropna()
-        text, scale = build_prompt(y, origin, cat, framing)
-        out = ask(prov, text, oa_model)
+    prompts = [build_prompt(panel[c].dropna(), o, c, f) for p, f, c, o in jobs]
+    done = [0]
+
+    def one(i):
+        out = ask(jobs[i][0], prompts[i][0], oa_model)
+        done[0] += 1
+        if done[0] % 20 == 0 or done[0] == len(jobs):
+            print(f"  {done[0]}/{len(jobs)} prompts done", flush=True)
+        return out
+
+    # requests are independent, so run them concurrently; results keep the job order
+    with ThreadPoolExecutor(workers) as pool:
+        outs = list(pool.map(one, range(len(jobs))))
+
+    rows, notes = [], []
+    for (prov, framing, cat, origin), (_, scale), out in zip(jobs, prompts, outs):
         vals = np.array(out["forecast"]) * scale
         idx = future_index(origin)
         rows.append(pd.DataFrame({"date": idx, "mean": vals, "model": DISPLAY[(prov, framing)],
                                   "category": cat, "origin": origin}))
         notes.append({"model": DISPLAY[(prov, framing)], "category": cat, "origin": origin.date(),
                       "llm_version": out.get("model"), "reasoning": out["reasoning"]})
-        if i % 20 == 0 or i == len(jobs):
-            print(f"  {i}/{len(jobs)} prompts done")
     fc = pd.concat(rows, ignore_index=True)
     fc["h"] = (fc["date"].dt.year - fc["origin"].dt.year) * 12 + fc["date"].dt.month - fc["origin"].dt.month
     return fc, pd.DataFrame(notes)
@@ -193,15 +208,19 @@ def main():
         for fr in ("anonymized", "named"):
             print(f"===== {fr} =====\n{build_prompt(panel['clothing'].dropna(), o, 'clothing', fr)[0][-600:]}\n")
         return
-    oa_model = openai_model()
+    # --only claude / --only openai runs one provider (e.g. while the other account is unfunded);
+    # cached responses make it safe to run the providers separately and then together.
+    only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
+    runs = [r for r in RUNS if only in (None, r[0])]
+    final_runs = [r for r in [("claude", "named"), ("openai", "named")] if only in (None, r[0])]
+    oa_model = openai_model() if any(p == "openai" for p, _ in runs) else None
     print("Claude model:", CLAUDE_MODEL, "| OpenAI model:", oa_model)
     long = panel[list(CATEGORIES)].stack().rename("actual").reset_index().rename(columns={"level_1": "category"})
 
     origins = [pd.Timestamp(f"{y}-08-01") for y in BACKTEST_YEARS]
-    bt, bt_notes = run(origins, RUNS, panel, oa_model)
+    bt, bt_notes = run(origins, runs, panel, oa_model)
     bt.merge(long, on=["date", "category"], how="left").to_csv(OUTPUTS / "llm_backtest_forecasts.csv", index=False)
 
-    final_runs = [("claude", "named"), ("openai", "named")]
     f26, f26_notes = run([pd.Timestamp(FINAL_ORIGIN)], final_runs, panel, oa_model)
     f26.merge(long, on=["date", "category"], how="left").to_csv(OUTPUTS / "llm_forecast_2026.csv", index=False)
     pd.concat([bt_notes, f26_notes]).to_csv(OUTPUTS / "llm_reasoning.csv", index=False)

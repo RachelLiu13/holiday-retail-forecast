@@ -1,0 +1,11 @@
+{
+ "reasoning": "The series has a gently rising trend, a strong December peak, and a January trough. I applied recent year-over-year growth of about 2\u20133% to last year's Sep\u2013Dec values. As a cross-check, I used the typical drop from August to September, which gave a similar September level.",
+ "forecast": [
+  127.6,
+  138.4,
+  160.8,
+  222.5
+ ],
+ "model": "claude-opus-5-5",
+ "prompt": "Below are 120 consecutive months of an anonymous monthly sales index (first month = 100). Only the calendar month is shown; the series runs oldest to newest.\n\nSep: 100.0\nOct: 110.4\nNov: 123.0\nDec: 201.7\nJan: 86.1\nFeb: 96.6\nMar: 109.6\nApr: 112.8\nMay: 114.4\nJun: 110.4\nJul: 108.9\nAug: 119.3\nSep: 112.2\nOct: 115.5\nNov: 129.7\nDec: 209.9\nJan: 93.0\nFeb: 100.5\nMar: 120.7\nApr: 114.3\nMay: 123.4\nJun: 115.5\nJul: 112.7\nAug: 126.0\nSep: 111.9\nOct: 117.6\nNov: 137.2\nDec: 203.8\nJan: 94.6\nFeb: 105.9\nMar: 118.7\nApr: 114.3\nMay: 127.5\nJun: 113.6\nJul: 116.1\nAug: 127.4\nSep: 106.1\nOct: 112.3\nNov: 125.4\nDec: 178.2\nJan: 89.4\nFeb: 98.0\nMar: 104.0\nApr: 109.2\nMay: 115.2\nJun: 103.1\nJul: 107.0\nAug: 118.1\nSep: 104.4\nOct: 113.9\nNov: 122.4\nDec: 180.6\nJan: 88.1\nFeb: 98.8\nMar: 116.2\nApr: 113.9\nMay: 118.3\nJun: 107.8\nJul: 112.6\nAug: 120.0\nSep: 108.5\nOct: 116.4\nNov: 133.8\nDec: 190.4\nJan: 91.5\nFeb: 106.4\nMar: 122.0\nApr: 124.7\nMay: 125.4\nJun: 118.8\nJul: 120.0\nAug: 128.9\nSep: 120.3\nOct: 122.1\nNov: 140.2\nDec: 207.7\nJan: 95.8\nFeb: 119.8\nMar: 134.9\nApr: 124.4\nMay: 133.3\nJun: 125.1\nJul: 122.2\nAug: 138.9\nSep: 122.9\nOct: 125.9\nNov: 147.2\nDec: 210.1\nJan: 101.3\nFeb: 116.2\nMar: 137.8\nApr: 128.4\nMay: 139.1\nJun: 126.8\nJul: 128.5\nAug: 144.5\nSep: 121.3\nOct: 133.0\nNov: 150.3\nDec: 211.0\nJan: 101.5\nFeb: 117.1\nMar: 134.5\nApr: 136.2\nMay: 144.4\nJun: 126.9\nJul: 132.9\nAug: 147.4\nSep: 124.9\nOct: 135.5\nNov: 157.4\nDec: 218.2\nJan: 105.6\nFeb: 120.5\nMar: 138.9\nApr: 136.6\nMay: 148.3\nJun: 131.8\nJul: 138.0\nAug: 149.8\n\nForecast the next 4 months (Sep, Oct, Nov, Dec) on the same index scale."
+}
