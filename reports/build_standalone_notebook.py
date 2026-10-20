@@ -139,6 +139,15 @@ C.append(code("CATS = list(CATEGORIES)\nENSEMBLE_OF = ['SARIMA', 'ETS', 'XGBoost
               defs("backtest", ["_stat_models", "run_origin_set", "attach_actuals"]) + """
 
 
+# Some SARIMA candidates in the AIC search do not converge; that is expected and handled (AIC picks
+# among the ones that fit). Silence those warnings inside the parallel worker processes.
+_stat_models_verbose = _stat_models
+def _stat_models(*args):
+    import warnings
+    warnings.simplefilter('ignore')
+    return _stat_models_verbose(*args)
+
+
 origins = [pd.Timestamp(f'{y}-08-01') for y in BACKTEST_YEARS]
 fc, orders, importance = run_origin_set(panel, origins)
 bt = attach_actuals(fc, panel)
