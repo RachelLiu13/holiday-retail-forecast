@@ -62,4 +62,4 @@ COVID seasons (2020-2021).
 - **Claude Opus 5.5** and **OpenAI GPT** were used as forecasters in the comparison (Option A).
 - **Claude Opus 5.5** powers the AI Advisor (Option B), constrained to the computed results.
 
-Source code: see the GitHub repository linked in our submission.
+Source code: [github.com/RachelLiu13/holiday-retail-forecast](https://github.com/RachelLiu13/holiday-retail-forecast)
