@@ -1,6 +1,6 @@
 ### About this project
 
-**Holiday Retail Planner 2026** - UCLA Anderson, *Time Series Analysis and Forecasting* (Dr. William Yu), group project, fall 2026.
+**Holiday Retail Planner 2026** - UCLA Anderson, *Time Series Analysis and Forecasting* (Dr. William Yu).
 Team: Charlotte Zhu, Shihan Wang, Jing Chang, Rachel Liu.
 
 #### Objective
